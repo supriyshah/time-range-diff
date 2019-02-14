@@ -11,11 +11,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.timediff.Application.subtractRanges;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
-public class ApplicationTest {
+public class DateTimeUtilsTest {
 
     @Test
     public void basicSuccessTest(){
@@ -31,7 +32,7 @@ public class ApplicationTest {
         RangeSet<LocalTime> expected = TreeRangeSet.create();
         expected.add(range3);
 
-        RangeSet<LocalTime> result = subtractRanges(primaryList, secondaryList);
+        RangeSet<LocalTime> result = DateTimeUtils.subtractRanges(primaryList, secondaryList);
         assertEquals(result, expected);
     }
 
@@ -45,7 +46,7 @@ public class ApplicationTest {
         Range<LocalTime> range2 = Range.closed(LocalTime.parse("09:00"), LocalTime.parse("10:30"));
         secondaryList.add(range2);
 
-        RangeSet<LocalTime> result = subtractRanges(primaryList, secondaryList);
+        RangeSet<LocalTime> result = DateTimeUtils.subtractRanges(primaryList, secondaryList);
         assertEquals(result.asRanges().size(),0);
     }
 
@@ -63,7 +64,7 @@ public class ApplicationTest {
         RangeSet<LocalTime> expected = TreeRangeSet.create();
         expected.add(range3);
 
-        RangeSet<LocalTime> result = subtractRanges(primaryList, secondaryList);
+        RangeSet<LocalTime> result = DateTimeUtils.subtractRanges(primaryList, secondaryList);
         assertEquals(result, expected);
     }
 
@@ -86,7 +87,7 @@ public class ApplicationTest {
         expected.add(range4);
         expected.add(range5);
 
-        RangeSet<LocalTime> result = subtractRanges(primaryList, secondaryList);
+        RangeSet<LocalTime> result = DateTimeUtils.subtractRanges(primaryList, secondaryList);
         assertEquals(result, expected);
     }
 
@@ -111,7 +112,7 @@ public class ApplicationTest {
         RangeSet<LocalTime> expected = TreeRangeSet.create();
         expected.add(range6);
         expected.add(range7);
-        RangeSet<LocalTime> result = subtractRanges(primaryList, secondaryList);
+        RangeSet<LocalTime> result = DateTimeUtils.subtractRanges(primaryList, secondaryList);
         assertEquals(result, expected);
     }
 
@@ -133,7 +134,80 @@ public class ApplicationTest {
         RangeSet<LocalTime> expected = TreeRangeSet.create();
         expected.add(range6);
 
-        RangeSet<LocalTime> result = subtractRanges(primaryList, secondaryList);
+        RangeSet<LocalTime> result = DateTimeUtils.subtractRanges(primaryList, secondaryList);
         assertEquals(result, expected);
     }
+
+    @Test
+    public void hmmInputTest(){
+
+        String primary = "9:00-10:00";
+        String secondary = "9:00-09:30";
+
+        List<Range<LocalTime>> primaryList = new ArrayList<>();
+        LocalTime[] primaryRange = DateTimeUtils.validateInputString(primary);
+        Range<LocalTime> range1 = Range.closed(primaryRange[0], primaryRange[1]);
+        primaryList.add(range1);
+
+        List<Range<LocalTime>> secondaryList = new ArrayList<>();
+        LocalTime[] secondaryRange = DateTimeUtils.validateInputString(secondary);
+        Range<LocalTime> range2 = Range.closed(secondaryRange[0], secondaryRange[1]);
+        secondaryList.add(range2);
+
+        Range<LocalTime> range3 = Range.openClosed(LocalTime.parse("09:30"), LocalTime.parse("10:00"));
+        RangeSet<LocalTime> expected = TreeRangeSet.create();
+        expected.add(range3);
+
+        RangeSet<LocalTime> result = DateTimeUtils.subtractRanges(primaryList, secondaryList);
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void invalidInput1Test(){
+        String primary = "900-1000";
+        List<Range<LocalTime>> primaryList = new ArrayList<>();
+        LocalTime[] primaryRange = DateTimeUtils.validateInputString(primary);
+        assertNull(primaryRange);
+    }
+
+    @Test
+    public void invalidInput2Test(){
+        String primary = "900:1000";
+        List<Range<LocalTime>> primaryList = new ArrayList<>();
+        LocalTime[] primaryRange = DateTimeUtils.validateInputString(primary);
+        assertNull(primaryRange);
+    }
+
+    @Test
+    public void validInputFormat(){
+        String primary = "(09:00-10:00)";
+        List<Range<LocalTime>> primaryList = new ArrayList<>();
+        LocalTime[] primaryRange = DateTimeUtils.validateInputString(primary);
+        assertNotNull(primaryRange);
+    }
+
+    @Test
+    public void randomTimeValueTest(){
+
+        String primary = "11:17 - 08:59";
+        String secondary = "0:11 -  9:39";
+
+        List<Range<LocalTime>> primaryList = new ArrayList<>();
+        LocalTime[] primaryRange = DateTimeUtils.validateInputString(primary);
+        Range<LocalTime> range1 = Range.closed(primaryRange[0], primaryRange[1]);
+        primaryList.add(range1);
+
+        List<Range<LocalTime>> secondaryList = new ArrayList<>();
+        LocalTime[] secondaryRange = DateTimeUtils.validateInputString(secondary);
+        Range<LocalTime> range2 = Range.closed(secondaryRange[0], secondaryRange[1]);
+        secondaryList.add(range2);
+
+        Range<LocalTime> range3 = Range.openClosed(LocalTime.parse("09:39"), LocalTime.parse("11:17"));
+        RangeSet<LocalTime> expected = TreeRangeSet.create();
+        expected.add(range3);
+
+        RangeSet<LocalTime> result = DateTimeUtils.subtractRanges(primaryList, secondaryList);
+        assertEquals(result, expected);
+    }
+
 }
