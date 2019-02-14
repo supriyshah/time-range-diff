@@ -10,11 +10,11 @@ Execution:
 1. Recommended Approach:  If Maven installed,
 	- git clone https://github.com/supriyshah/time-range-diff.git
 	- Change directory to cloned repository. Run the following commands
-	   mvn clean install
-	   mvn exec:java
+	   -mvn clean install
+	   -mvn exec:java
 
 
-2. If Maven not installed, download the folder from GDrive and unzip. Password for unzipping is "timediff123"
+2. If Maven not installed, download the folder from GDrive and unzip.
    (If Embedded jar blocked by firewall, follow Step 1)
    1. Change directory to /time-range-diff/target
    2. Run "java -jar time.range.diff-1.0-SNAPSHOT.jar"
